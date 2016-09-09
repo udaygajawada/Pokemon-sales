@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>Pokemon Sale</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		html, body {
+			height:100%;
+		}
+		body{
+			font-family: "Verdana";
+		}
+		#container{
+			width: 80%;
+			min-height: 100%;
+			margin: 4% auto;
+			padding: 2% 5%;
+			background: lightGrey;
+			box-sizing: border-box;
+		}
+		table,th,td{
+			border-collapse: collapse;
+		}
+		th,td{
+			border: 2px solid blue;
+			padding: 10px;
+		}
+		#tables>table, #quantity-input>*{
+			display: inline-block;
+			vertical-align: top;
+		}
+		#default-input>*{
+			display: block;
+			margin: 18px;
+		} 
+		#default-input{
+			border-left: 2px solid grey;
+		}
+		.formelements{
+			margin: 5px;
+		}
+		button,input[type=submit]{
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body>
+	<div id="container">
+		<h1>Pokemon Sale</h1>
+		<div id="tables">
+			<table>
+				<thead>
+					<th>Pokemon for Sale</th>
+					<th>Price</th>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Pikachu</td>
+						<td>&#36;6</td>
+					</tr>
+					<tr>
+						<td>Squirtle</td>
+						<td>&#36;5</td>			
+					</tr>
+					<tr>
+						<td>Charmander</td>
+						<td>&#36;5</td>			
+					</tr>
+				</tbody>
+			</table>
+			<table>
+				<thead>
+					<th>Number of Different Pokemon Purchased</th>
+					<th>Discount Amount</th>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>No discount</td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>10%</td>			
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>20%</td>			
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div id="quantity-input">
+			<div id="form-input">
+				<h3>Custom input:</h3>
+				<form name="cart" onsubmit="return calculatePrice()">
+					<div class="formelements">
+						<label for="pikachus">Pikachus Quantity</label>
+						<input type="number" name="pikachus" min="0"/>
+					</div>
+					<div class="formelements">
+						<label for="squirtles">Squirtles Quantity</label>
+						<input type="number" name="squirtles" min="0"/>
+					</div>
+					<div class="formelements">
+						<label for="charmanders">Charmanders Quantity</label>
+						<input type="number" name="charmanders" min="0"/>
+					</div>
+					<div class="formelements">
+						<input type="submit" value="Submit"/>
+					</div>
+				</form>
+			</div>
+			<div id="default-input">
+				<h3>Test cases:</h3>
+				<div>
+					<button type="button" onclick="calculatePrice(1,0,0)">1 Pikachu</button>
+					<button type="button" onclick="calculatePrice(2,0,0)">2 Pikachus</button>
+					<button type="button" onclick="calculatePrice(1,1,0)">1 Pikachu, 1 Squirtle</button>
+				</div>
+				<div>
+					<button type="button" onclick="calculatePrice(2,2,0)">2 Pikachus, 2 Squirtles</button>
+					<button type="button" onclick="calculatePrice(3,3,0)">3 Pikachus, 3 Squirtles</button>
+					<button type="button" onclick="calculatePrice(2,1,0)">2 Pikachus, 1 Squirtle</button>
+				</div>
+				<div>
+					<button type="button" onclick="calculatePrice(1,1,1)">1 Pikachu, 1 Squirtle, 1 Charmander</button>
+					<button type="button" onclick="calculatePrice(2,1,1)">2 Pikachus, 1 Squirtle, 1 Charmander</button>
+				</div>
+			</div>
+		</div>
+		<div>
+			<strong><span id="total"></span></strong>
+		</div>
+		<div>
+			<span id="summary"></span>
+		</div>
+	</div>
+	<script>
+		function calculatePrice(){
+			var pikachus = 0;
+			var squirtles = 0;
+			var charmanders = 0;
+			var priceOfPikachu = 6;
+			var priceOfSquirtle = 5;
+			var priceOfCharmanders = 5;
+			var total=0;
+			var items=[];
+			var prices=[];
+			var groupOfThree = 0;
+			var groupOfTwo = 0;
+			var newitems=[], newitems2=[];
+			
+			if(arguments.length==0){
+				pikachus = document.forms.cart.pikachus.value;
+				squirtles = document.forms.cart.squirtles.value;
+				charmanders = document.forms.cart.charmanders.value;
+			}else if(arguments.length==3){
+				document.forms.cart.reset();
+				pikachus = arguments[0];
+				squirtles = arguments[1];
+				charmanders = arguments[2];
+			}else{
+				document.getElementById('summary').innerHTML = "Something went wrong!";
+			}
+			
+			items=[pikachus, squirtles, charmanders];
+			prices=[priceOfPikachu,priceOfSquirtle,priceOfCharmanders];
+			
+			document.getElementById('summary').innerHTML = "";
+			
+			//calculating three grouped pokemon items to give 20% discount
+			groupOfThree = (items.length<3) ? 0 : Math.min.apply(null, items);
+			total += ((groupOfThree*prices[0])+(groupOfThree*prices[1])+(groupOfThree*prices[2]))*(1-(20/100));
+			
+			//creating new array 'newitems' with pokemons that are not three grouped
+			for(i=0;i<items.length;i++){
+				items[i] -= groupOfThree;
+			}
+			for(i=0;i<items.length;i++){
+				if(items[i]==0){
+					prices[i]=0;
+				}
+				else{
+					newitems.push(items[i]);
+				}
+			}
+			
+			//calculating two grouped pokemon items to give 10% discount
+			groupOfTwo = (newitems.length<2) ? 0 : Math.min.apply(null, newitems);
+			total += ((groupOfTwo*prices[0])+(groupOfTwo*prices[1])+(groupOfTwo*prices[2]))*(1-(10/100));
+			
+			//creating new array 'newitems2' with pokemons that are not two grouped and three grouped
+			for(i=0;i<items.length;i++){
+				if(items[i]!=0){
+					items[i] -= groupOfTwo;
+				}
+			} 
+			for(i=0;i<items.length;i++){
+				if(items[i]==0){
+					prices[i]=0;
+				}
+				else{
+					newitems2.push(items[i]);
+				}
+			}
+			
+			//calculating ungrouped pokemon items with No discount
+			groupOfOne = (newitems2.length<1) ? 0 : Math.min.apply(null, newitems2);
+			total += ((groupOfOne*prices[0])+(groupOfOne*prices[1])+(groupOfOne*prices[2]));
+			
+			//displaying total with 
+			//20% discount for three grouped pokemons,
+			//10% discount for two grouped pokemons,
+			//No discount for ungrouped pokemons.
+			document.getElementById('total').innerHTML = "Your total is &#36;" + total.toFixed(2);
+			
+			//displaying summary
+			document.getElementById('summary').innerHTML += "You have " + groupOfThree + " three grouped items<br/>";
+			document.getElementById('summary').innerHTML += "You have " + groupOfTwo + " two grouped items<br/>";
+			document.getElementById('summary').innerHTML += "You have " + groupOfOne + " ungrouped items";
+			return false;
+		}
+	</script>
+</body>
+</html>
